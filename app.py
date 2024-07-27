@@ -1,5 +1,6 @@
 import pandas as pd
 import streamlit as st
+import openpyxl  # Ensure openpyxl is imported
 
 # Streamlit app
 st.title('Excel Sheets Merger')
