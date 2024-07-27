@@ -6,7 +6,7 @@ st.title('Excel Sheets Merger')
 
 # User inputs for sheet names and columns
 sheet_names_input = st.text_area("Enter sheet names (comma-separated) e.g. 7amada, 7amada 1", value="")
-columns_input = st.text_area("Enter column names (comma-separated). Please blash tfty and write it as or better copy and paste because it's case-sensitive", value="")
+columns_input = st.text_area("Enter column names (comma-separated) using the same pattern as before. Please blash tfty and write it as is or better copy and paste because it's case-sensitive", value="")
 
 # Parse the user inputs
 sheet_names = [name.strip() for name in sheet_names_input.split(',')]
