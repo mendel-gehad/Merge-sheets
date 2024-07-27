@@ -1,0 +1,53 @@
+import pandas as pd
+import os
+from tqdm import tqdm
+
+# Define the directory containing the Excel files
+directory = '/Users/googie/Downloads/drive-download-20240716T181208Z-001'
+
+# Define the sheet names you want to merge
+sheet_names = ['H1_ICD-10-CM_(Non-IQVIA)', 'Cluster 1', 'Cluster 2', 'Cluster 3', 'Cluster 4', 'Cluster 5', 'Cluster 6', 'Cluster 7', 'Cluster 8', 'Cluster 9', 'Cluster 10']
+
+# Define the columns you want to include in the merged DataFrame
+columns = ['CODE', 'DESCRIPTION', 'Decision', 'Mendel ID', 'Concept Name', 'Missing Concept', 'Parent Mendel ID If Missing Concept', 'Parent Concept Name If Missing Concept']
+
+# Initialize an empty DataFrame to hold the merged data
+merged_df = pd.DataFrame(columns=columns + ['source_sheet'])
+
+# Get a list of Excel files in the directory
+excel_files = [f for f in os.listdir(directory) if f.endswith('.xlsx')]
+
+# Create a progress bar for the files
+with tqdm(total=len(excel_files) * len(sheet_names), desc='Processing files', unit='sheet') as pbar:
+    # Iterate over each file in the directory
+    for filename in excel_files:
+        filepath = os.path.join(directory, filename)
+
+        # Iterate over the specified sheet names
+        for sheet in sheet_names:
+            try:
+                # Read the sheet into a DataFrame with engine specified
+                df = pd.read_excel(filepath, sheet_name=sheet, engine='openpyxl')
+                
+                # Add a column for the source sheet
+                df['source_sheet'] = sheet
+
+                # Ensure only the desired columns are included, add missing columns if any
+                for col in columns:
+                    if col not in df.columns:
+                        df[col] = None
+                df = df[columns + ['source_sheet']]
+
+                # Concatenate the data
+                merged_df = pd.concat([merged_df, df], ignore_index=True)
+            except Exception as e:
+                print(f"Error processing file {filename}, sheet {sheet}: {e}")
+            
+            # Update the progress bar
+            pbar.update(1)
+
+# Save the merged DataFrame to a single Excel file
+output_file = os.path.join(directory, 'merged_output.xlsx')
+merged_df.to_excel(output_file, index=False)
+
+print("Merging complete. Merged file saved in the specified directory.")
